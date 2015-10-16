@@ -412,7 +412,7 @@ median.Frame <- h2o.median
 
 #' Range of an H2O Column
 #'
-#' @param x An H2O Frame object.
+#' @param ... An H2O Frame object.
 #' @param na.rm ignore missing values
 #' @export
 range.Frame <- function(...,na.rm = TRUE) c(min(...,na.rm=na.rm), max(...,na.rm=na.rm))
@@ -491,8 +491,10 @@ match.Frame <- h2o.match
 # %in% method
 #' @rdname h2o.match
 #' @export
-`%in%` <- function(x,table) h2o.match(x,table,nomatch=0)
-
+`%in%` <- function(x,table) {
+  if( is.Frame(x) ) h2o.match(x,table,nomatch=0)
+  else base::`%in%`(x,table) #keep for R CMD check
+}
 #' Remove Rows With NAs
 #'
 #' @rdname na.omit
@@ -999,7 +1001,7 @@ t.Frame <- function(x) .newExpr("t",x)
 
 #' @rdname Frame
 #' @export
-log.Frame <- function(x) .newExpr("log",x)
+log.Frame <- function(x, ...) .newExpr("log",x)
 
 #' @rdname Frame
 #' @export
@@ -1117,7 +1119,7 @@ h2o.setLevels <- function(x, levels) .newExpr("setDomain", chk.Frame(x), levels)
 #' tail(australia.hex, 10)
 #' }
 #' @export
-h2o.head <- function(x, n=6L) {
+h2o.head <- function(x, ..., n=6L) {
   stopifnot(length(n) == 1L)
   n <- if (n < 0L) max(nrow(x) + n, 0L)
        else        min(n, nrow(x))
@@ -1133,7 +1135,7 @@ head.Frame <- h2o.head
 
 #' @rdname h2o.head
 #' @export
-h2o.tail <- function(x, n=6L) {
+h2o.tail <- function(x, ..., n=6L) {
   endidx <- nrow(x)
   n <- ifelse(n < 0L, max(endidx + n, 0L), min(n, endidx))
   if( n==0L ) head(x,n=0L)
@@ -1164,7 +1166,10 @@ is.factor <- function(x) {
 #' @rdname is.numeric
 #' @param x An H2O Frame object
 #' @export
-is.numeric <- function(x) attr(.eval.frame(.newExpr("is.numeric",x)), "data")
+is.numeric <- function(x) {
+  if( is.Frame(x) ) attr(.eval.frame(.newExpr("is.numeric",x)), "data")
+  else .Primitive("is.numeric")(x) #keep for R CMD check
+}
 
 #' Print An H2O Frame
 #'
@@ -1521,6 +1526,7 @@ summary.Frame <- h2o.summary
 #'
 #' @name h2o.mean
 #' @param x An H2O Frame object.
+#' @param ... Ignored
 #' @param na.rm A logical value indicating whether \code{NA} or missing values should be stripped before the computation.
 #' @seealso \code{\link[base]{mean}} for the base R implementation.
 #' @examples
@@ -1531,7 +1537,7 @@ summary.Frame <- h2o.summary
 #' mean(prostate.hex$AGE)
 #' }
 #' @export
-h2o.mean <- function(x, na.rm=TRUE) attr(.eval.frame(.newExpr("mean",x,na.rm)), "data")
+h2o.mean <- function(x, ..., na.rm=TRUE) attr(.eval.frame(.newExpr("mean",x,na.rm)), "data")
 
 #' @rdname h2o.mean
 #' @export
@@ -1765,7 +1771,7 @@ as.vector.Frame <- function(x, mode) as.vector(as.matrix.Frame(x, mode))
 
 #`
 #' @export
-as.double.Frame <- function(x) {
+as.double.Frame <- function(x, ...) {
   res <- .fetch.data(x,1) # Force evaluation
   if( is.data.frame(res) ) {
     if( nrow(res)!=1L || ncol(res)!=1L ) stop("Cannot convert multi-element Frame into a double")
@@ -1775,7 +1781,7 @@ as.double.Frame <- function(x) {
 }
 
 #' @export
-as.logical.Frame <- function(x) {
+as.logical.Frame <- function(x, ...) {
   res <- .fetch.data(x,1) # Force evaluation
   if( is.data.frame(res) ) {
     if( nrow(res)!=1L || ncol(res)!=1L ) stop("Cannot convert multi-element Frame into a logical")
@@ -1785,7 +1791,7 @@ as.logical.Frame <- function(x) {
 }
 
 #' @export
-as.integer.Frame <- function(x) {
+as.integer.Frame <- function(x, ...) {
   x <- .fetch.data(x,1) # Force evaluation
   if( is.data.frame(x) ) {
     if( nrow(x)!=1L || ncol(x)!=1L ) stop("Cannot convert multi-element Frame into an integer")
@@ -1813,8 +1819,9 @@ as.factor <- function(x) .newExpr("as.factor",x)
 #' Convert an H2O Frame to a String
 #'
 #' @param x An H2O Frame object
+#' @param ... Ignored
 #' @export
-as.character.Frame <- function(x) .newExpr("as.character",x)
+as.character.Frame <- function(x, ...) .newExpr("as.character",x)
 
 #' Convert H2O Data to Numeric
 #'
@@ -1830,7 +1837,10 @@ as.character.Frame <- function(x) .newExpr("as.character",x)
 #' prostate.hex[,2] <- as.numeric(prostate.hex[,2])
 #' }
 #' @export
-as.numeric <- function(x) .newExpr("as.numeric",x)
+as.numeric <- function(x) {
+  if( is.Frame(x) ) .newExpr("as.numeric",x) #keep for R CMD check
+  else base::as.numeric(x)
+}
 
 #'
 #' Delete Columns from a Frame
@@ -2490,6 +2500,9 @@ h2o.nchar <- function(x) .newExpr("length", x)
 		function(...) if (any(sapply(list(...), is.Frame))) f(...) else h(...)
 	}
 
+	#these functions cannot be wrapped, otherwise R CMD check will fail
+	map_names_pkgs[c("is.numeric", "as.numeric", "%in%")] <- NULL
+
 	#Step 3: Call the wrapper to replace h2o's functions with new functions that calls h2o's verison (if input has Frame)
 	#or the conflicting package's version (if input does not have Frame)
 	for (i in 1:length(map_names_pkgs)) {
@@ -2500,4 +2513,4 @@ h2o.nchar <- function(x) .newExpr("length", x)
 	}
 }
 
-if (names(conflicts(detail=TRUE))[1] == ".GlobalEnv") .overwrite()
+if (search()[1] == ".GlobalEnv") .overwrite()
