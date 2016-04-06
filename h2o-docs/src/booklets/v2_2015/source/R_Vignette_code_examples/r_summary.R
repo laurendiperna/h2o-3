@@ -1,1 +1,1 @@
-summary(prostate.hex)
+summary(prostate_hex)

@@ -1,5 +1,5 @@
 # Load the data and prepare for modeling
-airlines.hex <- h2o.uploadFile(path = h2o:::.h2o.locate("smalldata/airlines/allyears2k_headers.zip"), header = TRUE, sep = ",", destination_frame = "airlines.hex")
+airlines.hex <- h2o.importFile("http://h2o-public-test-data.s3.amazonaws.com/smalldata/airlines/allyears2k_headers.zip")
 
 # Generate random numbers and create training, validation, testing splits
 r <- h2o.runif(airlines.hex)

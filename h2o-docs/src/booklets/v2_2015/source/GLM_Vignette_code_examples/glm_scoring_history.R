@@ -1,1 +1,1 @@
-binomial.fit@model$scoring_history
+glm_fit@model$scoring_history

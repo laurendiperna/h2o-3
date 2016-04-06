@@ -1,2 +1,2 @@
-h2o.confusionMatrix(binomial.fit, valid = FALSE)
-h2o.confusionMatrix(binomial.fit, valid = TRUE)
+h2o.confusionMatrix(glm_fit, valid = FALSE)
+h2o.confusionMatrix(glm_fit, valid = TRUE)

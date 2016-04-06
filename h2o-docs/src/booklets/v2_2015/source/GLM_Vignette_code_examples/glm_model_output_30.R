@@ -1,1 +1,1 @@
-binomial.fit@model$coefficients_table
+glm_fit@model$coefficients_table

@@ -1,12 +1,12 @@
 # Import prostate data
-prosPath <- system.file("extdata", "prostate.csv", package="h2o")
-prostate.hex <- h2o.importFile(path = prosPath)
+pros_path <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/extdata/prostate.csv"
+prostate_hex <- h2o.importFile(path = pros_path)
 
 # Converts column 4 (RACE) to an enum
-as.factor(prostate.hex[,4])
+as.factor(prostate_hex[,4])
 
-prostate.hex[,4] <- as.factor(prostate.hex[,4])
-as.factor(prostate.hex[,4])
+prostate_hex[,4] <- as.factor(prostate_hex[,4])
+as.factor(prostate_hex[,4])
 
 # Summary will return a count of the factors
-summary(prostate.hex[,4])
+summary(prostate_hex[,4])

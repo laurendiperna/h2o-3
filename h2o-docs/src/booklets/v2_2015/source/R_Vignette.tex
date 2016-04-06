@@ -492,7 +492,7 @@ There are a few ways to import files shown in the following examples:
 
 \subsection{Uploading Files}
 
-To upload a file in a directory local to your H2O instance, use {\texttt{h2o.importFile()}}.  {\texttt{h2o.uploadFile()}}  uploads data local to your H2O instance as well as uploading data local to your R session. In the parentheses, specify the H2O reference object in R and the complete URL or normalized file path for the file.
+To upload a file in a directory local or remote to your H2O instance, which will be visible at all h2o nodes use {\texttt{h2o.importFile()}} (this is the recommended option). {\texttt{h2o.uploadFile()}}  uploads data local to your H2O instance as well as uploading data local to your R session, where the data only needs to be on the client. In the parentheses, specify the H2O reference object in R and the complete URL or normalized file path for the file.
 
 
 \waterExampleInR
@@ -662,7 +662,7 @@ To append a column of random numbers to an H2O data frame for testing/training d
 \waterExampleInR
 \medskip
 \begin{lstlisting}[style=R]
-> prosPath <- system.file("extdata", "prostate.csv", package="h2o")
+> prosPath <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/prostate/prostate.csv"
 > prostate.hex <- h2o.importFile(path = prosPath)
 
 ## Creates object for uniform distribution on prostate data set
@@ -961,9 +961,9 @@ To map a set of variables onto a subspace using linear transformations, use {\te
 \medskip
 %\lstinputlisting[style=R]{R_Vignette_code_examples/r_pca.R} - Less helpful than original - needs output
 \begin{lstlisting}[style=R]
-> ausPath = system.file("extdata", "australia.csv", package="h2o")
-> australia.hex = h2o.importFile(path = ausPath)
-> australia.pca <- h2o.prcomp(training_frame = australia.hex, transform = "STANDARDIZE",k = 3)
+> ausPath = "http://h2o-public-test-data.s3.amazonaws.com/smalldata/extdata/australia.csv"
+> airlines_hex = h2o.importFile(path = ausPath)
+> australia.pca <- h2o.prcomp(training_frame = airlines_hex, transform = "STANDARDIZE",k = 3)
 > australia.pca
 Model Details:
 ==============
@@ -1034,9 +1034,8 @@ The following section lists some common R commands by function and a brief descr
 {\emph{Data Import/Export}}
 {\texttt{h2o.downloadCSV}}: Download a H2O dataset to a CSV file on local disk.
 {\texttt{h2o.exportFile}}: Export H2O Data Frame to a file.
-{\texttt{h2o.importFile}}: Import a file from the local path and parse it. 
-{\texttt{h2o.parseRaw}}: Parse a raw data file.  
-{\texttt{h2o.uploadFile}}: Upload a file from the local drive and parse it. 
+{\texttt{h2o.importFile}}: Import a file from the local or remote path and parse it.
+{\texttt{h2o.parseRaw}}: Parse a raw data file.
 \medskip
 {\emph{Native R to H2O Coercion}}\smallskip
  {\texttt{as.h2o}}: Convert an R object to an H2O object. 

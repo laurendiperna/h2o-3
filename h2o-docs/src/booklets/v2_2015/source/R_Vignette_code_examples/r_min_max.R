@@ -1,3 +1,3 @@
-min(prostate.hex$AGE)
+min(prostate_hex$AGE)
 
-max(prostate.hex$AGE)
+max(prostate_hex$AGE)

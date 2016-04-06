@@ -1,4 +1,4 @@
 ##Displays the titles of the columns
-colnames(iris.hex)
+colnames(iris_hex)
 
-names(iris.hex)
+names(iris_hex)
