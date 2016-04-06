@@ -211,6 +211,19 @@ class H2OEstimator(ModelBase):
     if name == "H2OPCA":                         return "pca"
     if name == "H2OSVD":                         return "svd"
 
+  def defaults(self):
+    algo = self._compute_algo()
+    parms = H2OConnection.get_json(url_suffix="ModelBuilders/" + algo)
+
+    parms = parms['model_builders'][algo]['parameters']
+    d = {}
+    for p in parms:
+      d[p['name']] =  p['default_value']
+
+    return d
+
+
+
   @staticmethod
   def mixin(obj,cls):
     for name in cls.__dict__:
